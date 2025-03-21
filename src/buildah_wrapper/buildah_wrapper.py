@@ -8,14 +8,14 @@ import logging
 import sys
 
 # Script version
-SCRIPT_VERSION = "0.0.0.1"
+SCRIPT_VERSION = "0.0.0.2"
 
 # ASCII art for Buildah Wrapper
 ASCII_ART = r"""
 +=========================================================================+
- /$$$$$$$$         /$$         /$$      /$$                           
-| $$_____/        |__/        | $$$    /$$$                           
-| $$       /$$$$$$ /$$ /$$$$$$| $$$$  /$$$$ /$$$$$$  /$$$$$$  /$$$$$$ 
+ /$$$$$$$$         /$$         /$$      /$$
+| $$_____/        |__/        | $$$    /$$$
+| $$       /$$$$$$ /$$ /$$$$$$| $$$$  /$$$$ /$$$$$$  /$$$$$$  /$$$$$$
 | $$$$$   /$$__  $| $$/$$_____| $$ $$/$$ $$/$$__  $$/$$__  $$/$$__  $$
 | $$__/  | $$  \ $| $| $$     | $$  $$$| $| $$  \ $| $$  \__| $$  \ $$
 | $$     | $$  | $| $| $$     | $$\  $ | $| $$  | $| $$     | $$  | $$
@@ -23,30 +23,39 @@ ASCII_ART = r"""
 |________| $$____/|__/\_______|__/     |__/\______/|__/      \____  $$
          | $$                                                /$$  \ $$
          | $$                                               |  $$$$$$/
- /$$$$$$$|__/      /$$/$$      /$$         /$$               \______/ 
-| $$__  $$        |__| $$     | $$        | $$                        
-| $$  \ $$/$$   /$$/$| $$ /$$$$$$$ /$$$$$$| $$$$$$$                   
-| $$$$$$$| $$  | $| $| $$/$$__  $$|____  $| $$__  $$                  
-| $$__  $| $$  | $| $| $| $$  | $$ /$$$$$$| $$  \ $$                  
-| $$  \ $| $$  | $| $| $| $$  | $$/$$__  $| $$  | $$                  
-| $$$$$$$|  $$$$$$| $| $|  $$$$$$|  $$$$$$| $$  | $$                  
-|_______/ \______/|__|__/\_______/\_______|__/  |__/                  
- /$$      /$$                                                         
-| $$  /$ | $$                                                         
-| $$ /$$$| $$ /$$$$$$ /$$$$$$  /$$$$$$  /$$$$$$  /$$$$$$  /$$$$$$     
-| $$/$$ $$ $$/$$__  $|____  $$/$$__  $$/$$__  $$/$$__  $$/$$__  $$    
-| $$$$_  $$$| $$  \__//$$$$$$| $$  \ $| $$  \ $| $$$$$$$| $$  \__/    
-| $$$/ \  $$| $$     /$$__  $| $$  | $| $$  | $| $$_____| $$          
-| $$/   \  $| $$    |  $$$$$$| $$$$$$$| $$$$$$$|  $$$$$$| $$          
-|__/     \__|__/     \_______| $$____/| $$____/ \_______|__/          
-                             | $$     | $$                            
-                             | $$     | $$                            
-                             |__/     |__/                            
+ /$$$$$$$|__/      /$$/$$      /$$         /$$               \______/
+| $$__  $$        |__| $$     | $$        | $$
+| $$  \ $$/$$   /$$/$| $$ /$$$$$$$ /$$$$$$| $$$$$$$
+| $$$$$$$| $$  | $| $| $$/$$__  $$|____  $| $$__  $$
+| $$__  $| $$  | $| $| $| $$  | $$ /$$$$$$| $$  \ $$
+| $$  \ $| $$  | $| $| $| $$  | $$/$$__  $| $$  | $$
+| $$$$$$$|  $$$$$$| $| $|  $$$$$$|  $$$$$$| $$  | $$
+|_______/ \______/|__|__/\_______/\_______|__/  |__/
+ /$$      /$$
+| $$  /$ | $$
+| $$ /$$$| $$ /$$$$$$ /$$$$$$  /$$$$$$  /$$$$$$  /$$$$$$  /$$$$$$
+| $$/$$ $$ $$/$$__  $|____  $$/$$__  $$/$$__  $$/$$__  $$/$$__  $$
+| $$$$_  $$$| $$  \__//$$$$$$| $$  \ $| $$  \ $| $$$$$$$| $$  \__/
+| $$$/ \  $$| $$     /$$__  $| $$  | $| $$  | $| $$_____| $$
+| $$/   \  $| $$    |  $$$$$$| $$$$$$$| $$$$$$$|  $$$$$$| $$
+|__/     \__|__/     \_______| $$____/| $$____/ \_______|__/
+                             | $$     | $$
+                             | $$     | $$
+                             |__/     |__/
 +=========================================================================+
 """
 
 def setup_logging():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def get_buildah_version():
+    """Get version of Buildah."""
+    try:
+        result = subprocess.run(['buildah', '-v'], capture_output=True, text=True, check=True)
+        return result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Failed to get Buildah version: {e}")
+        return "Unknown"
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Buildah Wrapper", add_help=False)
@@ -54,18 +63,15 @@ def parse_args():
     parser.add_argument('--version', '-v', action='store_true', help='Show script version')
     parser.add_argument('--help', '-h', action='store_true', help='Show this help message and exit')
     
-    # Aliases --build, --deploy и --clean
-    parser.add_argument('--build', action='store_true', help='Build images using Buildah')
-    parser.add_argument('--deploy', action='store_true', help='Deploy images using Buildah')
+    # Add --build, -b, --deploy, -d, --clean
+    parser.add_argument('--build', '-b', action='store_true', help='Build images using Buildah')
+    parser.add_argument('--deploy', '-d', action='store_true', help='Deploy images using Buildah')
     parser.add_argument('--clean', action='store_true', help='Clean all Buildah containers and images')
     
-    # Subcommands build, deploy и clean
+    # Subs build, deploy и clean
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     build_parser = subparsers.add_parser('build', help='Build images using Buildah')
-    build_parser.add_argument('--no-cache', action='store_true', help='Disable cache during build')
-    
     deploy_parser = subparsers.add_parser('deploy', help='Deploy images using Buildah')
-    
     clean_parser = subparsers.add_parser('clean', help='Clean all Buildah containers and images')
 
     return parser.parse_args()
@@ -74,20 +80,17 @@ def load_compose_file(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
 
-def build_with_buildah(service_name, build_context, dockerfile, image_name, no_cache):
+def build_with_buildah(service_name, build_context, dockerfile, image_name):
     buildah_command = [
         'buildah', 'build',
-        '--format', 'docker',
-        '--no-cache' if no_cache else '',
+        '--format', 'docker', # i am not want use oci format because it not support heathcheks
+        '--no-cache',
         '--rm',
         '--layers=false',
         '-f', f'{build_context}/{dockerfile}',
         '-t', image_name,
         build_context
     ]
-
-    # Remove empty strings from the command list
-    buildah_command = [arg for arg in buildah_command if arg]
 
     logging.info(f"Building {service_name} with Buildah: {' '.join(buildah_command)}")
     
@@ -132,7 +135,7 @@ def deploy_with_buildah(image_name):
         raise Exception(f"Failed to deploy {image_name}")
 
 def clean_buildah():
-    # RM containers and images
+    # Cleaup  containers
     rm_command = ['buildah', 'rm', '--all']
     logging.info(f"Cleaning Buildah containers: {' '.join(rm_command)}")
     
@@ -147,7 +150,7 @@ def clean_buildah():
         logging.error("Error cleaning Buildah containers")
         raise Exception("Failed to clean Buildah containers")
     
-    # Удаляем все образы
+    # Cleanup images
     rmi_command = ['buildah', 'rmi', '--all']
     logging.info(f"Cleaning Buildah images: {' '.join(rmi_command)}")
     
@@ -172,13 +175,15 @@ def show_help():
     print("--version, -v         Show script version")
     print("--help, -h            Show this help message and exit")
     print("\nCommands:")
-    print("build, --build        Build images using Buildah")
-    print("deploy, --deploy      Deploy images using Buildah")
-    print("clean, --clean        Clean all Buildah containers and images")
+    print("--build, -b           Build images using Buildah")
+    print("--deploy, -d          Deploy images using Buildah")
+    print("--clean               Clean all Buildah containers and images")
 
 def show_version():
+    buildah_version = get_buildah_version()
     print(ASCII_ART)
     print(f"Buildah Wrapper {SCRIPT_VERSION}, Python: {sys.version}")
+    print(f"Buildah: {buildah_version}")
 
 def main():
     setup_logging()
@@ -195,7 +200,7 @@ def main():
         show_version()
         return
     
-    # Cleaup if selected this arg
+    
     if args.clean or args.command == 'clean':
         try:
             clean_buildah()
@@ -230,7 +235,7 @@ def main():
             return
     
     try:
-        # Determine which command is selected: via a subcommand or an alias
+        
         command = args.command
         if args.build:
             command = 'build'
@@ -250,7 +255,7 @@ def main():
                         logging.warning(f"No image specified for service {service_name}")
                         continue
                     
-                    futures.append(executor.submit(build_with_buildah, service_name, build_context, dockerfile, image_name, args.no_cache))
+                    futures.append(executor.submit(build_with_buildah, service_name, build_context, dockerfile, image_name))
                 
                 for future in as_completed(futures):
                     future.result()
