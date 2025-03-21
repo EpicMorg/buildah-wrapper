@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/buildah_wrapper"]
+
+[project]
+name = "buildah-wrapper"
+version = "0.0.0.1"
+authors = [
+  {name = "EpicMorg", email = "developer@epicm.org"}
+]
+maintainers = [
+  {name = "EpicMorg", email = "developer@epicm.org"}
+]
+dependencies = [
+  "PyYAML",
+  "python-dotenv",
+]
+description = "EpicMorg: Buildah-Compose Wrapper - CLI wrapper for buildah build system"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.6"
+keywords = ["buildah", "docker", "build"]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Unix"
+]
+
+[project.scripts]
+buildah-wrapper = "buildah_wrapper.buildah_wrapper:main"
+
+[project.urls]
+Homepage = "https://github.com/EpicMorg/buildah-wrapper"
+Documentation = "https://github.com/EpicMorg/buildah-wrapper/blob/master/README.md"
+Repository = "https://github.com/EpicMorg/buildah-wrapper.git"
+"Bug Tracker" = "https://github.com/EpicMorg/buildah-wrapper/issues"
+Changelog = "https://github.com/EpicMorg/buildah-wrapper/blob/master/CHANGELOG.md"
