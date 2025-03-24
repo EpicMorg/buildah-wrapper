@@ -8,7 +8,7 @@ import logging
 import sys
 
 # Script version
-SCRIPT_VERSION = "0.0.0.2"
+SCRIPT_VERSION = "0.0.0.3"
 
 # ASCII art for Buildah Wrapper
 ASCII_ART = r"""
@@ -83,6 +83,8 @@ def load_compose_file(file_path):
 def build_with_buildah(service_name, build_context, dockerfile, image_name):
     buildah_command = [
         'buildah', 'build',
+        '--isolation=oci',
+        '--disable-compression=false',
         '--format', 'docker', # i am not want use oci format because it not support heathcheks
         '--no-cache',
         '--rm',
