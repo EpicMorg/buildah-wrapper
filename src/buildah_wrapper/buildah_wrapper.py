@@ -8,7 +8,7 @@ import logging
 import sys
 
 # Script version
-SCRIPT_VERSION = "0.0.0.6"
+SCRIPT_VERSION = "0.0.0.7"
 
 # ASCII art for Buildah Wrapper
 ASCII_ART = r"""
@@ -91,13 +91,14 @@ def build_with_buildah(service_name, build_context, dockerfile, image_name):
         '--no-cache',
         '--rm',
         '--layers=false',
-        '--squash',
+#        '--squash',
         '-f', f'{build_context}/{dockerfile}',
         '-t', image_name,
         build_context
     ]
 
-    logging.info(f"Building {service_name} with Buildah: {' '.join(buildah_command)}")
+    logging.info(f"Building {service_name} with Buildah:")
+    logging.info(f"{' '.join(buildah_command)}")
     
     process = subprocess.Popen(buildah_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
@@ -112,7 +113,7 @@ def build_with_buildah(service_name, build_context, dockerfile, image_name):
     else:
         for line in process.stderr:
             logging.error(line.strip())
-        logging.error(f"Error building {service_name}")
+        logging.error(f"Error building of {service_name}")
         raise Exception(f"Failed to build {service_name}")
 
 def deploy_with_buildah(image_name):
@@ -121,7 +122,8 @@ def deploy_with_buildah(image_name):
         image_name
     ]
 
-    logging.info(f"Deploying {image_name} with Buildah: {' '.join(buildah_command)}")
+    logging.info(f"Deploying service with Buildah:")
+    logging.info(f"{' '.join(buildah_command)}")
     
     process = subprocess.Popen(buildah_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
@@ -132,17 +134,20 @@ def deploy_with_buildah(image_name):
     process.wait()
     
     if process.returncode == 0:
-        logging.info(f"Successfully deployed {image_name}")
+        logging.info(f"Successfully deployed:")
+        logging.info(f"{' '.join(image_name)}")
     else:
         for line in process.stderr:
             logging.error(line.strip())
-        logging.error(f"Error deploying {image_name}")
+        logging.error(f"Error deploying of:")
+        logging.error(f"{' '.join(image_name)}")
         raise Exception(f"Failed to deploy {image_name}")
 
 def clean_buildah():
     # Cleaup  containers
     rm_command = ['buildah', 'rm', '--all']
-    logging.info(f"Cleaning Buildah containers: {' '.join(rm_command)}")
+    logging.info(f"Cleaning Buildah containers:")
+    logging.info(f"{' '.join(rm_command)}")
     
     rm_process = subprocess.Popen(rm_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     for line in rm_process.stdout:
@@ -157,7 +162,8 @@ def clean_buildah():
     
     # Cleanup images
     rmi_command = ['buildah', 'rmi', '--all']
-    logging.info(f"Cleaning Buildah images: {' '.join(rmi_command)}")
+    logging.info(f"Cleaning Buildah images:")
+    logging.info(f"{' '.join(rmi_command)}")
     
     rmi_process = subprocess.Popen(rmi_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     for line in rmi_process.stdout:

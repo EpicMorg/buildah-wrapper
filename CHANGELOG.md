@@ -1,6 +1,9 @@
 # Changelog
-* `0.0.0.5`: 
-    * added `--squash
+* `0.0.0.7`: 
+    * logs updated
+    * squash disabled
+* `0.0.0.6`: 
+    * added `--squash`
 * `0.0.0.5`: 
     * added `--networl=host`
 * `0.0.0.4`:
