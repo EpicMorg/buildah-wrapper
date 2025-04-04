@@ -8,7 +8,7 @@ import logging
 import sys
 
 # Script version
-SCRIPT_VERSION = "0.0.0.5"
+SCRIPT_VERSION = "0.0.0.6"
 
 # ASCII art for Buildah Wrapper
 ASCII_ART = r"""
@@ -91,6 +91,7 @@ def build_with_buildah(service_name, build_context, dockerfile, image_name):
         '--no-cache',
         '--rm',
         '--layers=false',
+        '--squash',
         '-f', f'{build_context}/{dockerfile}',
         '-t', image_name,
         build_context

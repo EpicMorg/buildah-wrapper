@@ -7,7 +7,7 @@ packages = ["src/buildah_wrapper"]
 
 [project]
 name = "buildah-wrapper"
-version = "0.0.0.5"
+version = "0.0.0.6-1"
 authors = [
   {name = "EpicMorg", email = "developer@epicm.org"}
 ]
