@@ -8,7 +8,7 @@ import logging
 import sys
 
 # Script version
-SCRIPT_VERSION = "0.0.0.7"
+SCRIPT_VERSION = "0.0.0.8"
 
 # ASCII art for Buildah Wrapper
 ASCII_ART = r"""
@@ -67,10 +67,12 @@ def parse_args():
     parser.add_argument('--build', '-b', action='store_true', help='Build images using Buildah')
     parser.add_argument('--deploy', '-d', action='store_true', help='Deploy images using Buildah')
     parser.add_argument('--clean', action='store_true', help='Clean all Buildah containers and images')
+    parser.add_argument('--squash', action='store_true', help='Squash newly built layers into a single new layer')
     
     # Subs build, deploy и clean
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
     build_parser = subparsers.add_parser('build', help='Build images using Buildah')
+    build_parser.add_argument('--squash', action='store_true', help='Squash newly built layers into a single new layer')
     deploy_parser = subparsers.add_parser('deploy', help='Deploy images using Buildah')
     clean_parser = subparsers.add_parser('clean', help='Clean all Buildah containers and images')
 
@@ -80,7 +82,7 @@ def load_compose_file(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
 
-def build_with_buildah(service_name, build_context, dockerfile, image_name):
+def build_with_buildah(service_name, build_context, dockerfile, image_name, squash=False):
     buildah_command = [
         'buildah', 'build',
         '--isolation=oci',
@@ -91,11 +93,16 @@ def build_with_buildah(service_name, build_context, dockerfile, image_name):
         '--no-cache',
         '--rm',
         '--layers=false',
-#        '--squash',
+    ]
+    
+    if squash:
+        buildah_command.append('--squash')
+    
+    buildah_command.extend([
         '-f', f'{build_context}/{dockerfile}',
         '-t', image_name,
         build_context
-    ]
+    ])
 
     logging.info(f"Building {service_name} with Buildah:")
     logging.info(f"{' '.join(buildah_command)}")
@@ -189,6 +196,7 @@ def show_help():
     print("--build, -b           Build images using Buildah")
     print("--deploy, -d          Deploy images using Buildah")
     print("--clean               Clean all Buildah containers and images")
+    print("--squash              Squash newly built layers into a single new layer")
 
 def show_version():
     buildah_version = get_buildah_version()
@@ -266,7 +274,10 @@ def main():
                         logging.warning(f"No image specified for service {service_name}")
                         continue
                     
-                    futures.append(executor.submit(build_with_buildah, service_name, build_context, dockerfile, image_name))
+                    # Get squash flag from args
+                    squash = args.squash or (hasattr(args, 'command') and args.command == 'build' and getattr(args, 'squash', False))
+                    
+                    futures.append(executor.submit(build_with_buildah, service_name, build_context, dockerfile, image_name, squash))
                 
                 for future in as_completed(futures):
                     future.result()
