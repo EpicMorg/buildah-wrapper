@@ -7,12 +7,18 @@ packages = ["src/buildah_wrapper"]
 
 [project]
 name = "buildah-wrapper"
-version = "0.0.0.8"
+version = "1.0.0.0"
 authors = [
-  {name = "EpicMorg", email = "developer@epicm.org"}
+    {name = "Travoltik", email = "spitefuldragons@mail.ru"},
+    {name = "Marry", email = "okomarova@saber.games"},
+    {name = "EpicMorg", email = "developer@epicm.org"}
+
 ]
 maintainers = [
-  {name = "EpicMorg", email = "developer@epicm.org"}
+    {name = "Travoltik", email = "spitefuldragons@mail.ru"},
+    {name = "Marry", email = "okomarova@saber.games"},
+    {name = "EpicMorg", email = "developer@epicm.org"}
+
 ]
 dependencies = [
   "PyYAML",
@@ -22,7 +28,7 @@ description = "EpicMorg: Buildah-Compose Wrapper - CLI wrapper for buildah build
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.6"
-keywords = ["buildah", "docker", "build"]
+keywords = ["buildah", "docker", "build", "wrapper", "ci", "podman"]
 
 classifiers = [
     "Programming Language :: Python :: 3",

@@ -1,4 +1,8 @@
 # Changelog
+* `1.0.0.0`: 
+    * 1.0 release!
+	* fixed Logic
+	* bugfixes
 * `0.0.0.8`: 
     * squash added as optional
 * `0.0.0.7`: 
