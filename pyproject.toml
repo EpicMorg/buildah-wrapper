@@ -18,7 +18,6 @@ maintainers = [
     {name = "Travoltik", email = "spitefuldragons@mail.ru"},
     {name = "Marry", email = "okomarova@saber.games"},
     {name = "EpicMorg", email = "developer@epicm.org"}
-
 ]
 dependencies = [
   "PyYAML",
