@@ -7,22 +7,26 @@ packages = ["src/buildah_wrapper"]
 
 [project]
 name = "buildah-wrapper"
-version = "0.0.0.8"
+version = "2.0.2.6"
 authors = [
-  {name = "EpicMorg", email = "developer@epicm.org"}
+    {name = "EpicMorg", email = "developer@epicm.org"}
 ]
+
 maintainers = [
-  {name = "EpicMorg", email = "developer@epicm.org"}
+    {name = "EpicMorg", email = "developer@epicm.org"}
 ]
 dependencies = [
   "PyYAML",
   "python-dotenv",
+  "termcolor",
+  "pydantic-settings",
+  "colorlog"
 ]
-description = "EpicMorg: Buildah-Compose Wrapper - CLI wrapper for buildah build system"
+description = "EpicMorg: Buildah-Compose Wrapper - CLI wrapper for Buildah build system"
 readme = "README.md"
-license = {file = "LICENSE"}
-requires-python = ">=3.6"
-keywords = ["buildah", "docker", "build"]
+license = {file = "LICENSE.md"}
+requires-python = ">=3.9"
+keywords = ["buildah", "docker", "oci", "build", "wrapper", "ci"]
 
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -30,12 +34,15 @@ classifiers = [
     "Operating System :: Unix"
 ]
 
+[project.optional-dependencies]
+test = ["pytest"]
+
 [project.scripts]
 buildah-wrapper = "buildah_wrapper.buildah_wrapper:main"
 
 [project.urls]
-Homepage = "https://github.com/EpicMorg/buildah-wrapper"
-Documentation = "https://github.com/EpicMorg/buildah-wrapper/blob/master/README.md"
-Repository = "https://github.com/EpicMorg/buildah-wrapper.git"
+"Homepage" = "https://github.com/EpicMorg/buildah-wrapper"
+"Documentation" = "https://github.com/EpicMorg/buildah-wrapper/blob/master/README.md"
+"Repository" = "https://github.com/EpicMorg/buildah-wrapper.git"
 "Bug Tracker" = "https://github.com/EpicMorg/buildah-wrapper/issues"
-Changelog = "https://github.com/EpicMorg/buildah-wrapper/blob/master/CHANGELOG.md"
+"Changelog" = "https://github.com/EpicMorg/buildah-wrapper/blob/master/CHANGELOG.md"
